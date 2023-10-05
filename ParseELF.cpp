@@ -23,3 +23,10 @@ size_t ParseELF::getFilesz() const {
 const std::string &ParseELF::getPath() const {
 	return _path;
 }
+
+void ParseELF::mapNameToSection() {
+	auto strTable = _shdrs.at(_hdr->e_shstrndx);
+	std::shared_ptr<uint8_t[]> strTableMem(_mem, reinterpret_cast<uint8_t*>(_mem.get() + strTable.sh_offset));
+	for(auto section : _shdrs)
+		_nameSection[reinterpret_cast<const char*>(&strTableMem[section.sh_name])] = section;
+}

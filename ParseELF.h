@@ -7,6 +7,7 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+#include <map>
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <elf.h>
@@ -17,14 +18,12 @@
 extern int errno;
 
 class ParseELF {
+	void mapNameToSection();
+	std::map<std::string, Elf64_Shdr> _nameSection;
 	std::vector<Elf64_Shdr> _shdrs;
 	std::vector<Elf64_Phdr> _phdrs;
 	std::shared_ptr<uint8_t[]> _mem;
 	std::shared_ptr<Elf64_Ehdr> _hdr;
-public:
-	const std::string &getPath() const;
-
-private:
 	std::string _path;
 	int _fd;
 	size_t _filesz;
@@ -57,12 +56,16 @@ public:
 		std::shared_ptr<Elf64_Shdr[]> s(_mem, reinterpret_cast<Elf64_Shdr *>(_mem.get() + _hdr->e_shoff));
 		for (int i = 0; i < _hdr->e_shnum; i++)
 			_shdrs.push_back(s[i]);
+
+		mapNameToSection();
 	}
 
 	const std::vector<Elf64_Phdr> &getPhdrs() const;
 	const std::vector<Elf64_Shdr> &getShdrs() const;
 	const std::shared_ptr<Elf64_Ehdr> &getHdr() const;
+	const std::string &getPath() const;
 	size_t getFilesz() const;
+
 };
 
 

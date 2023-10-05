@@ -13,15 +13,15 @@ int main(int argc, char **argv)
 		return 1;
 	}
 	std::string elfPath = argv[1];
-	std::unique_ptr<ParseELF> parser;
+	std::shared_ptr<ParseELF> parser;
 	try {
-		parser = std::make_unique<ParseELF>(elfPath);
+		parser = std::make_shared<ParseELF>(elfPath);
 	}catch(ExceptionHandler e) {
 		e.report();
 		exit(ERROR);
 	}
 
-	Detection detect(const_cast<const ParseELF&>(*parser));
+	Detection detect(parser);
 	detect.scan();
 
 	return 0;

@@ -7,6 +7,13 @@
 void Detection::scan() const {
 	embeddedPayload();
 }
+/*
+ * The entry-point for execution should be at the start of the text section.
+ */
+
+int Detection::textSegmentPadding() const{
+	return 0;
+}
 
 /*
  * Calculate the size the elf binary should be based on ELF metadata with the following:
@@ -14,10 +21,12 @@ void Detection::scan() const {
  */
 
 int Detection::embeddedPayload() const {
-	auto calcFilesz = _hdr->e_shoff + (_hdr->e_shentsize * _hdr->e_shnum);
-	if(calcFilesz < _filesz) {
-		std::cout << "Possible embedded payload alert (" << _elfPath << ")" << std::endl;
-		std::cout << "filesize (disk) = " << _filesz << std::endl;
+	auto hdr = _parser->getHdr();
+	auto filesz = _parser->getFilesz();
+	auto calcFilesz = hdr->e_shoff + (hdr->e_shentsize * hdr->e_shnum);
+	if(calcFilesz < filesz) {
+		std::cout << "Possible embedded payload alert (" << _parser->getPath() << ")" << std::endl;
+		std::cout << "filesize (disk) = " << filesz << std::endl;
 		std::cout << "filesize (calculated from ELF metadata) = " << calcFilesz << std::endl;
 		return -1;
 	}

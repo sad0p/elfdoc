@@ -10,19 +10,16 @@
 
 class Detection {
 public:
-	Detection(const ParseELF &parseElf) {
-		_filesz = parseElf.getFilesz();
-		_hdr = parseElf.getHdr();
-		_elfPath = parseElf.getPath();
-
+	Detection(std::shared_ptr<ParseELF> parser) {
+		_parser = parser;
 	}
 
 	void scan() const;
+
 private:
-	size_t _filesz;
-	std::string _elfPath;
-	std::shared_ptr<Elf64_Ehdr> _hdr;
+	std::shared_ptr<ParseELF> _parser;
 	int embeddedPayload() const;
+	int textSegmentPadding() const;
 };
 
 
