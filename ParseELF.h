@@ -27,6 +27,10 @@ class ParseELF {
 	std::string _path;
 	int _fd;
 	size_t _filesz;
+	uint64_t _memStart;
+	uint64_t _memEnd;
+	bool _brokenPhdr;
+	bool _brokenShdr;
 
 public:
 	ParseELF(std::string& path) {
@@ -48,16 +52,25 @@ public:
 			throw ExceptionHandler( "Not an ELF binary (" + _path + ")");
 
 		_hdr = std::reinterpret_pointer_cast<Elf64_Ehdr>(_mem);
+		_memStart = reinterpret_cast<uint64_t>(_mem.get());
+		_memEnd = reinterpret_cast<uint64_t>(_mem.get()) + _filesz;
 
-		std::shared_ptr<Elf64_Phdr[]> p(_mem, reinterpret_cast<Elf64_Phdr *>(_mem.get() + _hdr->e_phoff));
-		for (int i = 0; i < _hdr->e_phnum; i++)
-			_phdrs.push_back(p[i]);
+		auto offPhdrTableEnd = _hdr->e_phoff + (_hdr->e_phentsize * _hdr->e_phnum);
+		_brokenPhdr = _memEnd < (_memStart + offPhdrTableEnd);
+		if(!_brokenPhdr) {
+			std::shared_ptr<Elf64_Phdr[]> p(_mem, reinterpret_cast<Elf64_Phdr *>(_mem.get() + _hdr->e_phoff));
+			for (int i = 0; i < _hdr->e_phnum; i++)
+				_phdrs.push_back(p[i]);
+		}
 
-		std::shared_ptr<Elf64_Shdr[]> s(_mem, reinterpret_cast<Elf64_Shdr *>(_mem.get() + _hdr->e_shoff));
-		for (int i = 0; i < _hdr->e_shnum; i++)
-			_shdrs.push_back(s[i]);
-
-		mapNameToSection();
+		auto offShdrTableEnd = _hdr->e_shoff + (_hdr->e_shentsize * _hdr->e_shnum);
+		_brokenShdr = _memEnd < (_memStart + offShdrTableEnd) ;
+		if(!_brokenShdr) {
+			std::shared_ptr<Elf64_Shdr[]> s(_mem, reinterpret_cast<Elf64_Shdr *>(_mem.get() + _hdr->e_shoff));
+			for (int i = 0; i < _hdr->e_shnum; i++)
+				_shdrs.push_back(s[i]);
+			mapNameToSection();
+		}
 	}
 
 	const std::vector<Elf64_Phdr> &getPhdrs() const;
@@ -65,7 +78,10 @@ public:
 	const std::shared_ptr<Elf64_Ehdr> &getHdr() const;
 	const std::string &getPath() const;
 	size_t getFilesz() const;
-
+	std::map<std::string, Elf64_Shdr> getSectionNameMapping() const;
+	uint64_t getMemStart() const;
+	bool isBrokenPhdr() const;
+	bool isBrokenShdr() const;
 };
 
 
