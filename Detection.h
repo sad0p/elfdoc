@@ -8,6 +8,7 @@
 #include <elf.h>
 #include "ParseELF.h"
 
+#define INDICATIVE_OF_MOD_POST_COMPILATION "Indicative of modification post compilation."
 class Detection {
 public:
 	Detection(std::shared_ptr<ParseELF> parser) {

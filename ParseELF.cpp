@@ -26,10 +26,10 @@ const std::string &ParseELF::getPath() const {
 
 void ParseELF::mapNameToSection() {
 	auto strTable = _shdrs.at(_hdr->e_shstrndx);
-	if (_memEnd < (strTable.sh_offset + _filesz)) {
+	if (_memEnd > (strTable.sh_offset + _memStart)) {
 		std::shared_ptr<uint8_t[]> strTableMem(_mem, reinterpret_cast<uint8_t *>(_mem.get() + strTable.sh_offset));
 		for (auto section: _shdrs) {
-			if(_memEnd > (section.sh_offset + section.sh_name + _memEnd))
+			if(_memEnd > (section.sh_offset + section.sh_name + _memStart))
 				_nameSection[reinterpret_cast<const char *>(&strTableMem[section.sh_name])] = section;
 		}
 	}
