@@ -20,7 +20,7 @@ public:
 private:
 	std::shared_ptr<ParseELF> _parser;
 	int embeddedPayload() const;
-	int textSegmentPadding() const;
+	int entryPointModification() const;
 };
 
 

@@ -64,7 +64,7 @@ public:
 		}
 
 		auto offShdrTableEnd = _hdr->e_shoff + (_hdr->e_shentsize * _hdr->e_shnum);
-		_brokenShdr = _memEnd < (_memStart + offShdrTableEnd) ;
+		_brokenShdr = _memEnd < (_memStart + offShdrTableEnd);
 		if(!_brokenShdr) {
 			std::shared_ptr<Elf64_Shdr[]> s(_mem, reinterpret_cast<Elf64_Shdr *>(_mem.get() + _hdr->e_shoff));
 			for (int i = 0; i < _hdr->e_shnum; i++)

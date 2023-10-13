@@ -24,7 +24,7 @@ void Detection::scan() const {
 	}
 
 	if(!(brokenShdr || brokenPhdr)) {
-		textSegmentPadding();
+		entryPointModification();
 	}
 }
 
@@ -32,7 +32,7 @@ void Detection::scan() const {
  * The entry-point for execution should be at the start of the text section.
  */
 
-int Detection::textSegmentPadding() const{
+int Detection::entryPointModification() const {
 	auto nameSectionMap = _parser->getSectionNameMapping();
 	auto textSection = nameSectionMap[".text"];
 	uint64_t e_entry = _parser->getHdr()->e_entry;
