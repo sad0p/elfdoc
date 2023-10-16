@@ -18,6 +18,6 @@ Single file
 
 `elfdoc <path-to-file>`
 
-Direction scan bash for-loop.
+Directory scan bash for-loop.
 
 ``` for file in .; do elfdoc $file ; done ```
