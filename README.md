@@ -10,4 +10,14 @@ Proof of concept heuristic detection for common ELF infection algorithms.
 
 # Build (requires cmake)
 
-`mkdir build; cmake ../ ; make`
+`mkdir build; cd build; cmake .. ; make`
+
+# Run
+
+Single file 
+
+`elfdoc <path-to-file>`
+
+Direction scan bash for-loop.
+
+``` for file in .; do elfdoc $file ; done ```
