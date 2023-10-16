@@ -25,7 +25,24 @@ void Detection::scan() const {
 
 	if(!(brokenShdr || brokenPhdr)) {
 		entryPointModification();
+		ptNoteToPtLoad();
 	}
+}
+
+int Detection::ptNoteToPtLoad() const {
+	int executableCount = 0;
+	auto phdrs = _parser->getPhdrs();
+	for(auto& p : phdrs) {
+		if(p.p_type == PT_LOAD && p.p_flags == (PF_R | PF_X))
+			executableCount++;
+	}
+	auto infected = executableCount >= 2;
+	if(infected) {
+		std::cout << _parser->getPath() << " PT_NOTE Infection characteristics detected" << std::endl;
+		std::cout << "Number of Segments marked executable at " << executableCount << std::endl;
+	}
+
+	return infected ? -1 : 0;
 }
 
 /*

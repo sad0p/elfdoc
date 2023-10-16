@@ -19,8 +19,9 @@ public:
 
 private:
 	std::shared_ptr<ParseELF> _parser;
-	int embeddedPayload() const;
+	int ptNoteToPtLoad() const;
 	int entryPointModification() const;
+	int embeddedPayload() const;
 };
 
 
